@@ -45,6 +45,8 @@ using namespace std;
 //===========================================================================
 int main()
 {
+	float ar = 0.0394;		// service demand
+	double Z = 2.0;         // think time
 	float mu[M + 1];     // mu[i] = service rate for each node
 	int   count;       // Current number of customers in network
 	float t[M + 1];      // t[i] = delay at node i w/ count customers in network
@@ -52,6 +54,10 @@ int main()
 	float n[M + 1];      // n[i] = num at node i w/ count customers in network
 	float total_delay; // Current total delay across all nodes (sum of n[i])
 	int   i;           // Counter variable
+
+	double Qi[100];
+	double Rprime[100];
+	double X[100];
 
 	// Initialize service rate (cust/sec) for all M nodes
 	mu[1] = 0.0771;
@@ -66,6 +72,11 @@ int main()
 	// Main loop to iterate for customer count from 1 to N
 	for (count = 1; count <= N; count++)
 	{
+
+		Rprime[count] = ar * (1.0 + Qi[count - 1]);
+		X[count] = count / (Z + Rprime[count]);
+		Qi[count] = X[count] * Rprime[count];
+
 		// Calculate the average waiting time in each node with an
 		// additional customer based on the number of customers in each
 		// queue from the previous loop.  This is the "PASTA step".
