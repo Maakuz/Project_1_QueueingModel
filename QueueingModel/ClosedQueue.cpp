@@ -36,7 +36,7 @@
 
 //----- Defines -------------------------------------------------------------
 #define M   4        // Number of nodes
-#define N   10        // Number of customers
+#define N   1522        // Number of customers
 
 //===========================================================================
 //=  Main program                                                           =
