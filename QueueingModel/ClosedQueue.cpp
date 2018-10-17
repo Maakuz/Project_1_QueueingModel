@@ -10,9 +10,11 @@ int main()
     int totalCustomers = 0;
     int discVisitors[4] = { 0 };
     int maximumConcurrent = 0;
+    int totalCompleted = 0;
     ////////////////////////
 
 
+    int maxDownloadTime = 0;
 
     const float cpuTime = 39.4f;
     bool cpuProcessing = false;
@@ -102,6 +104,7 @@ int main()
                    // printf("Disk %d klar!\r\n", i);
                     discProcessing[i] = false;
                     discProgress[i] = 0.f;
+                    totalCompleted++;
                 }
             }
         }
@@ -118,6 +121,7 @@ int main()
     }
 
     std::cout << "Maximum concurrent workers measured: " << maximumConcurrent << std::endl;
+    std::cout << "Total amount of jobs completed: " << totalCompleted << std::endl;
 
     system("pause");
 
