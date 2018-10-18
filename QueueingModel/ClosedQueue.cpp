@@ -160,7 +160,7 @@ void closedModel()
     std::vector<float> utilization[NODES];                                  //Ui
     std::vector<float> queueLength[NODES];                                  //Qi
     float demand[NODES] = { 0.0394f, 0.0771f, 0.1238f, 0.0804f, 0.235f};    //Di
-    int customers = 100;                                                    //N     //iterations <-- commentcomment
+    int customers = 0;                                                      //N     //iterations <-- commentcomment
 
     systemThroughput.push_back(0);
 
@@ -171,7 +171,11 @@ void closedModel()
         queueLength[i].push_back(0);
     }
 
-    
+
+    std::cout << "Enter population (int): ";
+    std::cin >> customers;
+    std::cin.ignore();
+
     for (int i = 1; i < customers; i++)
     {
         for (int j = 0; j < NODES; j++)
@@ -192,36 +196,48 @@ void closedModel()
             queueLength[j].push_back(systemThroughput[i] * residenceTime[j][i]);
             utilization[j].push_back(systemThroughput[i] * demand[j] * 100);
         }
-
-
     }
 
     //Printing big data
-    std::cout << std::fixed << std::showpoint <<  std::setprecision(3);
-    std::string info[NODES] = {"CPU           --- ","Disk 1        --- ","Disk 2        --- ","Disk 3        --- ","Disk 4        --- "};
+    std::string info[NODES] = { "CPU           --- ","Disk 1        --- ","Disk 2        --- ","Disk 3        --- ","Disk 4        --- " };
 
-    for (int i = 0; i < customers; i++)
+    std::string answer = "";
+    std::cout << "Display data? (Y/N) ";
+    std::cin >> answer;
+
+    int from = 0;
+    std::cout << "Display how many from end(int): ";
+    std::cin >> from;
+    std::cin.ignore();
+
+    if (from <= 0)
     {
-        std::cout << "Customer " << std::setw(4) << i  <<  " --- Throughput: " << std::setw(8) << systemThroughput[i] << "\r\n";
-
-        for (int j = 0; j < NODES; j++)
-        {
-            std::cout << info[j] << "Queue: " << std::setw(13) << queueLength[j][i] <<
-                " --- Residence time: " << std::setw(9) << residenceTime[j][i] << //also response time
-                " --- Utilization: " << std::setw(9) << utilization[j][i] << "% \r\n";
-
-        }
-
-        std::cout << std::endl;
+        from = customers;
     }
 
-    system("pause");
+    if (answer == "Y" || answer == "y")
+    {
 
-    
-    std::string answer("");
+        std::cout << std::fixed << std::showpoint << std::setprecision(3);
+
+        for (int i = customers - from; i < customers; i++)
+        {
+            std::cout << "Customer " << std::setw(4) << i << " --- Throughput: " << std::setw(8) << systemThroughput[i] << "\r\n";
+
+            for (int j = 0; j < NODES; j++)
+            {
+                std::cout << info[j] << "Queue: " << std::setw(13) << queueLength[j][i] <<
+                    " --- Residence time: " << std::setw(9) << residenceTime[j][i] <<       //also response time
+                    " --- Utilization: " << std::setw(9) << utilization[j][i] << "% \r\n";
+
+            }
+
+            std::cout << std::endl;
+        }
+    }
+
+    answer = "";
     std::cout << "save data? (Y/N) ";
-
-
     std::cin >> answer;
 
     if (answer == "Y" || answer == "y")
@@ -250,4 +266,5 @@ void closedModel()
         file.close();
     }
 
+    system("pause");
 }
