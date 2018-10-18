@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <string>
+#include <fstream>
 
 #define EPSYLONE 0.01f
 
@@ -213,11 +214,40 @@ void closedModel()
 
         std::cout << std::endl;
     }
-    
-
-    
-
-    
 
     system("pause");
+
+    
+    std::string answer("");
+    std::cout << "save data? (Y/N) ";
+
+
+    std::cin >> answer;
+
+    if (answer == "Y" || answer == "y")
+    {
+        std::string fileName("");
+        std::cout << "Enter file name WITH EXTENSION: ";
+        std::cin >> fileName;
+
+        std::ofstream file(fileName);
+
+        for (int i = 0; i < customers; i++)
+        {
+            file << "Customer " << std::setw(4) << i << " --- Throughput: " << std::setw(8) << systemThroughput[i] << std::endl;
+
+            for (int j = 0; j < NODES; j++)
+            {
+                file << info[j] << "Queue: " << std::setw(13) << queueLength[j][i] <<
+                    " --- Residence time: " << std::setw(9) << residenceTime[j][i] << //also response time
+                    " --- Utilization: " << std::setw(9) << utilization[j][i] << "%" << std::endl;
+
+            }
+
+            file << std::endl;
+        }
+
+        file.close();
+    }
+
 }
