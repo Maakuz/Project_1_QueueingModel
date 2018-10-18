@@ -35,8 +35,8 @@
 #include <iostream>
 
 //----- Defines -------------------------------------------------------------
-#define M   4        // Number of nodes
-#define N   1522        // Number of customers
+#define M   5        // Number of nodes
+#define N   100        // Number of customers
 
 //===========================================================================
 //=  Main program                                                           =
@@ -52,10 +52,11 @@ void main(void)
 	int   i;           // Counter variable
 
 	// Initialize service rate (cust/sec) for all M nodes
-	mu[1] = 0.0771;
-	mu[2] = 0.1238;
-	mu[3] = 0.0804;
-	mu[4] = 0.235;
+	mu[1] = 0.0394;
+	mu[2] = 0.0771;
+	mu[3] = 0.1238;
+	mu[4] = 0.0804;
+	mu[5] = 0.235;
 
 	// Initialize the number of customers in all M nodes to zero
 	for (i = 1; i <= M; i++)
