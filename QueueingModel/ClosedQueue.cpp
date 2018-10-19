@@ -6,6 +6,9 @@
 #include <fstream>
 
 #define EPSYLONE 0.01f
+#define NROFDISKS 5
+
+#define SPEEDYCPUUSED true
 
 void openModel();
 void closedModel();
@@ -19,27 +22,37 @@ int main()
 
 void openModel()
 {
+    
+
+#if SPEEDYCPUUSED
+    const float cpuTime = 39.4f / 2.f;
+#else 
+    const float cpuTime = 39.4f;
+#endif
+#if NROFDISKS == 5
+    const float discTime[NROFDISKS] = { 77.1f, 77.1f, 123.8f, 80.4f, 235.f };
+#elif NROFDISKS == 4
+    const float discTime[NROFDISKS] = {77.1f, 123.8f, 80.4f, 235.f };
+#endif
+
     //data collecting
     int totalCustomers = 0;
-    int discVisitors[4] = { 0 };
+    int diskVisitors[NROFDISKS] = { 0 };
     int maximumConcurrent = 0;
     int totalCompleted = 0;
     ////////////////////////
 
 
-    int maxDownloadTime = 0;
 
-    const float speedyCpuTime = 39.4f;
-    const float cpuTime = 39.4f;
+
     bool cpuProcessing = false;
     float cpuProgress = 0;
     int cpuQueue = 0;
 
-    const float discTime[4] = { 77.1f, 123.8f, 80.4f, 235.f };
-    int discQueue[4] = { 0 };
-    bool discProcessing[4] = { false };
-    float discProgress[4] = { 0.f };
-    int diskCompleted[4] = { 0 };
+    int discQueue[NROFDISKS] = { 0 };
+    bool discProcessing[NROFDISKS] = { false };
+    float discProgress[NROFDISKS] = { 0.f };
+    int diskCompleted[NROFDISKS] = { 0 };
 
     float arrival = 0;
     float time = 0;
@@ -62,9 +75,6 @@ void openModel()
     char loadEqually = 0;
     std::cin >> loadEqually;
     std::cin.ignore();
-    
-
-    //Testa att ha "hur många requests av massa hinner den göra på T tid".
 
     //converting time to microseconds for better precision
     time *= 10;
@@ -103,17 +113,17 @@ void openModel()
                 {
                     static int tracker = 0;
                     discQueue[tracker]++;
-                    discVisitors[tracker]++;
+                    diskVisitors[tracker]++;
 
                     tracker++;
-                    tracker %= 4;
+                    tracker %= NROFDISKS;
                 }
 
                 else
                 {
                     //find most efficient queue
                     int shortest = 0;
-                    for (int i = 0; i < 4; i++)
+                    for (int i = 0; i < NROFDISKS; i++)
                     {
                         //accounting for if the disc is working or not
                         if (discQueue[i] + (int)discProcessing[i] < discQueue[shortest] + (int)discProcessing[shortest])
@@ -122,7 +132,7 @@ void openModel()
 
                     //printf("Skicka till disk %d!\r\n", shortest);
                     discQueue[shortest]++;
-                    discVisitors[shortest]++;
+                    diskVisitors[shortest]++;
                 }
 
                 
@@ -131,7 +141,7 @@ void openModel()
 
         //disk processing
         int currentlyWorking = 0;
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < NROFDISKS; i++)
         {
             if (!discProcessing[i] && discQueue[i] > 0)
             {
@@ -161,13 +171,23 @@ void openModel()
 
     std::cout << "Cpu queue: " << cpuQueue << " --- Total customers: " << totalCustomers << std::endl;
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < NROFDISKS; i++)
     {
-        std::cout << "Disc " << i << " - Queue size: " << std::setw(4) << discQueue[i] << " --- Total jobs recieved: " << std::setw(4) << discVisitors[i] << " --- Total jobs completed: " << std::setw(4) << diskCompleted[i] << std::endl;
+        std::cout << "Disc " << i << " - Queue size: " << std::setw(4) << discQueue[i] << " --- Total jobs recieved: " << std::setw(4) << diskVisitors[i] << " --- Total jobs completed: " << std::setw(4) << diskCompleted[i] << std::endl;
     }
 
     std::cout << "Maximum concurrent workers measured: " << maximumConcurrent << std::endl;
     std::cout << "Total amount of jobs completed: " << totalCompleted << std::endl;
+    
+    int totalIncomplete = 0;
+    for (int i = 0; i < NROFDISKS; i++)
+    {
+        totalIncomplete += diskVisitors[i];
+        totalIncomplete -= diskCompleted[i];
+    }
+
+    std::cout << "Total amount of jobs incomplete: " << totalIncomplete << std::endl;
+
 
     printf("Press Enter to close\r\n");
     std::cin.get();
