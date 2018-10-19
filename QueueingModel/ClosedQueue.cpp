@@ -6,9 +6,10 @@
 #include <fstream>
 
 #define EPSYLONE 0.01f
-#define NROFDISKS 5
 
+#define NROFDISKS 4 //4-6          6 not really needed for this project
 #define SPEEDYCPUUSED true
+#define SLOWCPU false
 
 void openModel();
 void closedModel();
@@ -26,13 +27,17 @@ void openModel()
 
 #if SPEEDYCPUUSED
     const float cpuTime = 39.4f / 2.f;
+#elif SLOWCPU
+    const float cpuTime = 137.f;
 #else 
     const float cpuTime = 39.4f;
 #endif
-#if NROFDISKS == 5
+#if NROFDISKS == 4
+const float discTime[NROFDISKS] = { 77.1f, 123.8f, 80.4f, 235.f };
+#elif NROFDISKS == 5
     const float discTime[NROFDISKS] = { 77.1f, 77.1f, 123.8f, 80.4f, 235.f };
-#elif NROFDISKS == 4
-    const float discTime[NROFDISKS] = {77.1f, 123.8f, 80.4f, 235.f };
+#elif NROFDISKS == 6
+    const float discTime[NROFDISKS] = { 77.1f, 77.1f, 77.1f, 123.8f, 80.4f, 235.f };
 #endif
 
     //data collecting
@@ -61,9 +66,16 @@ void openModel()
     std::cin >> arrival;
     std::cin.ignore();
 
-    if (arrival <= 0)
+    if (arrival == 0)
     {
         cpuQueue = INT_MAX;
+        arrival = -1;
+    }
+
+    //Super hack to add jobs directly to the queue
+    else if (arrival < 0)
+    {
+        cpuQueue = -arrival;
         arrival = -1;
     }
 
@@ -187,6 +199,7 @@ void openModel()
     }
 
     std::cout << "Total amount of jobs incomplete: " << totalIncomplete << std::endl;
+    std::cout << "Total throughput per second: " << totalCompleted / (time / 10000) << std::endl;
 
 
     printf("Press Enter to close\r\n");
