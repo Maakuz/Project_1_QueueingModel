@@ -12,7 +12,7 @@ void closedModel();
 
 int main()
 {
-    closedModel();
+    openModel();
 
 	return 0;
 }
@@ -29,6 +29,7 @@ void openModel()
 
     int maxDownloadTime = 0;
 
+    const float speedyCpuTime = 39.4f;
     const float cpuTime = 39.4f;
     bool cpuProcessing = false;
     float cpuProgress = 0;
@@ -38,6 +39,7 @@ void openModel()
     int discQueue[4] = { 0 };
     bool discProcessing[4] = { false };
     float discProgress[4] = { 0.f };
+    int diskCompleted[4] = { 0 };
 
     float arrival = 0;
     float time = 0;
@@ -55,6 +57,12 @@ void openModel()
     printf("type timeframe (ms): ");
     std::cin >> time;
     std::cin.ignore();
+
+    printf("Load disks equally? Equally is not optimally(Y/N) ");
+    char loadEqually = 0;
+    std::cin >> loadEqually;
+    std::cin.ignore();
+    
 
     //Testa att ha "hur många requests av massa hinner den göra på T tid".
 
@@ -90,18 +98,34 @@ void openModel()
                 cpuProcessing = false;
                 cpuProgress = 0.f;
 
-                //find most efficient queue
-                int shortest = 0;
-                for (int i = 0; i < 4; i++)
+
+                if (loadEqually == 'y' || loadEqually == 'Y')
                 {
-                    //accounting for if the disc is working or not
-                    if (discQueue[i] + (int)discProcessing[i] < discQueue[shortest] + (int)discProcessing[shortest])
-                        shortest = i;
+                    static int tracker = 0;
+                    discQueue[tracker]++;
+                    discVisitors[tracker]++;
+
+                    tracker++;
+                    tracker %= 4;
                 }
 
-                //printf("Skicka till disk %d!\r\n", shortest);
-                discQueue[shortest]++;
-                discVisitors[shortest]++;
+                else
+                {
+                    //find most efficient queue
+                    int shortest = 0;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        //accounting for if the disc is working or not
+                        if (discQueue[i] + (int)discProcessing[i] < discQueue[shortest] + (int)discProcessing[shortest])
+                            shortest = i;
+                    }
+
+                    //printf("Skicka till disk %d!\r\n", shortest);
+                    discQueue[shortest]++;
+                    discVisitors[shortest]++;
+                }
+
+                
             }
         }
 
@@ -125,6 +149,7 @@ void openModel()
                     // printf("Disk %d klar!\r\n", i);
                     discProcessing[i] = false;
                     discProgress[i] = 0.f;
+                    diskCompleted[i]++;
                     totalCompleted++;
                 }
             }
@@ -138,13 +163,14 @@ void openModel()
 
     for (int i = 0; i < 4; i++)
     {
-        std::cout << "Disc " << i << " - Queue size: " << discQueue[i] << " --- Total requests: " << discVisitors[i] << std::endl;
+        std::cout << "Disc " << i << " - Queue size: " << std::setw(4) << discQueue[i] << " --- Total jobs recieved: " << std::setw(4) << discVisitors[i] << " --- Total jobs completed: " << std::setw(4) << diskCompleted[i] << std::endl;
     }
 
     std::cout << "Maximum concurrent workers measured: " << maximumConcurrent << std::endl;
     std::cout << "Total amount of jobs completed: " << totalCompleted << std::endl;
 
-    system("pause");
+    printf("Press Enter to close\r\n");
+    std::cin.get();
 }
 
 void closedModel()
